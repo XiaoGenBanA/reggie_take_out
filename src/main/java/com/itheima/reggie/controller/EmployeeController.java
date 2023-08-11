@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.itheima.reggie.common.R;
 import com.itheima.reggie.entity.Employee;
 import com.itheima.reggie.service.EmployeeSerivce;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,9 +13,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("employee")
+@Slf4j
 public class EmployeeController {
     @Autowired
     private EmployeeSerivce employeeSerivce;
@@ -52,10 +55,36 @@ public class EmployeeController {
 
     }
 
+    /**
+     * 退出
+     * @param servletRequest
+     * @return
+     */
     @PostMapping("logout")
     public R logout(HttpServletRequest servletRequest){
         servletRequest.getSession().removeAttribute("employee");
         return R.success("退出成功");
     }
+
+    /**
+     * 新增员工
+     * @param servletRequest
+     * @param employee
+     * @return
+     */
+    @PostMapping
+    public R saveEmployee(HttpServletRequest servletRequest,@RequestBody Employee employee){
+        log.info("新增员工，信息: {}",employee);
+        employee.setCreateTime(LocalDateTime.now());
+        employee.setUpdateTime(LocalDateTime.now());
+        Long id = (Long) servletRequest.getSession().getAttribute("employee");
+        String password = DigestUtils.md5DigestAsHex("123456".getBytes());
+        employee.setPassword(password);
+        employee.setCreateUser(id);
+        employee.setUpdateUser(id);
+        employeeSerivce.save(employee);
+        return R.success("添加成功");
+    }
+
 
 }
