@@ -1,16 +1,16 @@
 package com.itheima.reggie.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.itheima.reggie.common.R;
 import com.itheima.reggie.entity.Employee;
+import com.itheima.reggie.filter.LoginCheckFilter;
 import com.itheima.reggie.service.EmployeeSerivce;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.DigestUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
@@ -86,5 +86,54 @@ public class EmployeeController {
         return R.success("添加成功");
     }
 
+    /**
+     * 员工列表分页查询
+     * @param page
+     * @param pageSize
+     * @return
+     */
+    @GetMapping("page")
+    public R<Page> listEmployee(int page,int pageSize,String name){
+        log.info("传的当前页是:{} 每页大小为:{} name:{}",page,pageSize,name);
+        //分页构造器
+        Page pageInfo = new Page(page,pageSize);
+        //条件构造器
+        LambdaQueryWrapper<Employee> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        if (null != name) {
+            lambdaQueryWrapper.like(Employee::getName, name);
+        }
+        lambdaQueryWrapper.orderByDesc(Employee::getUpdateTime);
+        employeeSerivce.page(pageInfo,lambdaQueryWrapper);
+        System.out.println(pageInfo.toString());
+        return R.success(pageInfo);
+    }
+
+    /**
+     * 通过ID修改员工信息
+     * @param employee
+     * @return
+     */
+    @PutMapping
+    public R updateEmployeeById(HttpServletRequest request,@RequestBody Employee employee){
+        Long empId = (Long) request.getSession().getAttribute("employee");
+        employee.setUpdateTime(LocalDateTime.now());
+        employee.setUpdateUser(empId);
+        employeeSerivce.updateById(employee);
+        return R.success("修改成功");
+    }
+
+    /**
+     * 通过ID回显员工信息
+     * @param id
+     * @return
+     */
+    @GetMapping("{id}")
+    public R<Employee> getEmployeeById(@PathVariable Long id){
+        Employee employee = employeeSerivce.getById(id);
+        if (null != employee){
+            return R.success(employee);
+        }
+        return R.error("不存在此员工信息");
+    }
 
 }
