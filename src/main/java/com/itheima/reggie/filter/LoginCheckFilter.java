@@ -1,6 +1,7 @@
 package com.itheima.reggie.filter;
 
 import com.alibaba.fastjson.JSON;
+import com.itheima.reggie.common.BaseContext;
 import com.itheima.reggie.common.R;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.AntPathMatcher;
@@ -39,6 +40,8 @@ public class LoginCheckFilter implements Filter {
         }
 
         if (httpServletRequest.getSession().getAttribute("employee") != null){
+            Long empId = (Long) httpServletRequest.getSession().getAttribute("employee");
+            BaseContext.setId(empId);
             filterChain.doFilter(httpServletRequest,httpServletResponse);
             return;
         }

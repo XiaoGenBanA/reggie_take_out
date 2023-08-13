@@ -1,52 +1,69 @@
 package com.itheima.reggie.entity;
 
-import com.alibaba.fastjson.annotation.JSONField;
 import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.apache.ibatis.annotations.Insert;
-
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+/**
+ * 套餐
+ */
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class Employee implements Serializable {
+public class Setmeal implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     private Long id;
 
-    private String username;
 
+    //分类id
+    private Long categoryId;
+
+
+    //套餐名称
     private String name;
 
-    @JSONField(serialize = false)
-    private String password;
 
-    private String phone;
+    //套餐价格
+    private BigDecimal price;
 
-    private String sex;
 
-    private String idNumber;
-
+    //状态 0:停用 1:启用
     private Integer status;
+
+
+    //编码
+    private String code;
+
+
+    //描述信息
+    private String description;
+
+
+    //图片
+    private String image;
+
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
+
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
 
+
     @TableField(fill = FieldFill.INSERT)
     private Long createUser;
+
 
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private Long updateUser;
 
 
+    //是否删除
+    private Integer isDeleted;
 }
