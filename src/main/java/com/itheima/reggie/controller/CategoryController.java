@@ -10,6 +10,8 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @Slf4j
 @RequestMapping("category")
@@ -55,6 +57,21 @@ public class CategoryController {
     public R<String> delCategory(@RequestParam("ids") Long id){
         categoryService.remove(id);
         return R.success("删除成功");
+    }
+
+    /**
+     * 菜品分类查询
+     * @param type
+     * @return
+     */
+    @GetMapping("list")
+    public R<List<Category>> list(Integer type){
+        LambdaQueryWrapper<Category> qw = new LambdaQueryWrapper<>();
+        qw.eq(type != null,Category::getType,type);
+        qw.orderByAsc(Category::getSort);
+        List<Category> list = categoryService.list(qw);
+        return R.success(list);
+
     }
 
 }
